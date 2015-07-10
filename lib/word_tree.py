@@ -18,12 +18,18 @@ class WordTree(object):
     def check_word(self, word):
         return self.head.check_word(word)
 
+    def all_words(self, string):
+        result = []
+        self.head.all_words(string, result)
+        return result
+
 
 class LetterNode(object):
     def __init__(self, letter):
         self.is_word = False
         self.letter = letter
         self.children = {}
+        self.parent = None
 
     def add_word(self, word):
         if len(word) == 0:
@@ -36,6 +42,7 @@ class LetterNode(object):
     def addChild(self, letter):
         child = LetterNode(letter)
         self.children[letter] = child
+        child.parent = self
         return child
 
 
@@ -51,6 +58,10 @@ class LetterNode(object):
     def get_child(self, letter):
         return self.children.get(letter, None)
 
+    def get_parent(self):
+        return self.parent
+
+
 
     def set_word(self):
         self.is_word = True
@@ -64,3 +75,22 @@ class LetterNode(object):
                 return child.check_word(word[1:len(word)])
             else:
                 return False
+
+
+    def all_words(self, word, words):
+        if word.length == 0:
+            if self.is_word:
+                words.append(self.get_word)
+        else:
+            if word[0] == "_":
+                for child in self.children.values():
+                    child.all_words(word[1:], words)
+            else:
+                if self.children.get(word[0], False):
+                    self.children[word[0]].all_words(word[1:], words)
+
+    def get_word(self):
+        if self.parent:
+            return self.parent.get_word() + self.letter
+        else:
+            return self.letter

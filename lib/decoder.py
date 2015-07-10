@@ -1,6 +1,6 @@
 from Tkinter import *
 from caesar import *
-
+from frequency_table import *
 class Decoder:
 
     def __init__(self, master):
@@ -25,7 +25,8 @@ class Decoder:
 
         self.caesar_button.grid(row = 2, column = 0)
 
-
+        self.frequency_button = Button(self.frame, text ="frequency table", command=self.frequencies)
+        self.frequency_button.grid(row = 2, column = 1)
 
     def update_message(self):
         self.message = self.encrypted_entry.get("1.0",END)
@@ -39,9 +40,12 @@ class Decoder:
 
 
     def frequencies(self):
-        return
+        self.update_message()
+        frequencies = DecryptTable(self,frame, self.message)
 
-    
+
+
+
 
 root = Tk()
 d = Decoder(root)
