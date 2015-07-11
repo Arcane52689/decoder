@@ -18,9 +18,9 @@ class WordTree(object):
     def check_word(self, word):
         return self.head.check_word(word)
 
-    def all_words(self, string):
+    def all_words(self, string, known):
         result = []
-        self.head.all_words(string, result)
+        self.head.all_words(string, result, known)
         return result
 
 
@@ -77,14 +77,15 @@ class LetterNode(object):
                 return False
 
 
-    def all_words(self, word, words):
+    def all_words(self, word, words, known):
         if word.length == 0:
             if self.is_word:
                 words.append(self.get_word)
         else:
             if word[0] == "_":
                 for child in self.children.values():
-                    child.all_words(word[1:], words)
+                    if child not in known:
+                        child.all_words(word[1:], words)
             else:
                 if self.children.get(word[0], False):
                     self.children[word[0]].all_words(word[1:], words)
