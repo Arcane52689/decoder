@@ -13,7 +13,6 @@ class Solver(object):
             word = Word(encrypted, decrypted, self.word_tree, self.known)
             self.words.append(word)
 
-
     def check_all_words(letter):
         result = self.words[0].possible_solutions(letter)
         for i in range(1, len(self.words)):
@@ -21,9 +20,16 @@ class Solver(object):
             result = self.combine_results(result, result2)
         return result
 
+    def create_possibilities(self):
+        self.possibilities = {}
+        for i in range(0, 26):
+            letter = chr(97 + i)
+            if letter not in self.known.getkeys():
+                self.possibilities[letter] = self.check_all_words(letter)
+        return self.possibilities
 
-
-
+    def check_for_solutions(self):
+        self.possiblities.getkeys()
 
     def combine_results(self, dict1, dict2):
         result = {}
@@ -31,6 +37,11 @@ class Solver(object):
             if dict2.get(key, False):
                 result[key] = dict1[key] + dict2[key]
         return result
+
+    def update_known(self, encrypted_letter, decrypted_letter):
+        self.known[encrypted_letter] = decrypted_letter
+        for word in self.words:
+            word.update_decrypted(encrypted_letter, decrypted_letter)
 
 
 
@@ -100,3 +111,10 @@ class Word(object):
             if dict2.get(key, False):
                 result[key] = dict1[key] + dict2[key]
         return result
+
+    def update_decrypted(self, encrypted, decrypted):
+        indices = self.indices_of_letters(encrypted)
+        decrypted_arr = self.decrypted.split("")
+        for index in indices:
+            decrypted_arr = decrypted
+        self.decrypted = "".join(decrypted_arr)
