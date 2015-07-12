@@ -29,7 +29,13 @@ class Solver(object):
         return self.possibilities
 
     def check_for_solutions(self):
-        self.possiblities.getkeys()
+        keys = self.possiblities.getkeys()
+        for key in keys:
+            if len(self.possibilities[key]) == 0:
+                return False
+            if len(self.possibilities[key]) == 1:
+                self.update_known(key, self.possibilites[key][0])
+        return True
 
     def combine_results(self, dict1, dict2):
         result = {}
@@ -47,7 +53,7 @@ class Solver(object):
 
 
 class Word(object):
-
+    # A class to represent the words in an encrypted message.  Each word keeps track of it's encrypted and decrypted states, using '_' for unknown characters
     def __init__(self, encrypted, decrypted, word_tree, known):
         self.word_tree = word_tree
         self.encrypted = encrypted
@@ -57,18 +63,22 @@ class Word(object):
         self.known = known
 
     def find_possible_words(self):
+        """Finds all possible words in the english dictionary"""
         self.possible_words = self.word_tree.all_words(self.decrypted)
         self.set_frequencies()
 
 
     def number_of_possibilities(self):
+        """Returns the number of possible words"""
         return len(self.possible_words)
 
 
     def all_words(self):
+        """Returns self.possible_words"""
         return self.possible_words
 
     def set_frequencies(self):
+        """Determines the frequency of letter occurences in possible words at different indices"""
         self.frequencies = {}
         for i in range(0, len(self.encryped)):
             if self.decrypted[i] == "_":
@@ -78,12 +88,14 @@ class Word(object):
         return self.frequencies
 
     def letters_at_index(self, index):
+        """ Returns all the possible letters and their counts at a certain index"""
         result = {}
         for word in self.possible_words:
             result[word[index]] = result.get(word[index], 0) + 1
         return result
 
     def indices_of_letter(self, letter):
+        """Finds all the indices of an encrypted letter in a word"""
         result = []
         for i in range(0, len(self.encrypted)):
             if letter == self.encrypted[i]:
@@ -92,6 +104,7 @@ class Word(object):
 
 
     def possible_solutions(self, letter):
+        """Finds all the possible solutions of a letter at a given word"""
         indices = self.indices_of_letter(letter)
         if len(indices) == 0:
             return {}
@@ -106,6 +119,7 @@ class Word(object):
 
 
     def combine_results(self, dict1, dict2):
+        """ A simple hash intersection function that combines the counts of letters  This way if a hash of { a: 1, b: 2, d: 1 } were combined with { a: 1, b: 3, c: 1 }, the result would be { a: 2, b: 5 }"""
         result = {}
         for key in dict1.getkeys():
             if dict2.get(key, False):
@@ -113,8 +127,10 @@ class Word(object):
         return result
 
     def update_decrypted(self, encrypted, decrypted):
+        """ Updates the encrypted word with a solution.  Then reruns find_possible_words."""
         indices = self.indices_of_letters(encrypted)
         decrypted_arr = self.decrypted.split("")
         for index in indices:
             decrypted_arr = decrypted
         self.decrypted = "".join(decrypted_arr)
+        self.find_possible_words()
